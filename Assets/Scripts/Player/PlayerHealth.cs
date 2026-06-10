@@ -9,7 +9,6 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private float invincibilityDuration = 1.5f;
 
     private const int BlinkCount = 3;
-    private const float DeathReloadDelay = 1f;
 
     private int _currentHealth;
     private bool _isInvincible;
@@ -85,14 +84,6 @@ public class PlayerHealth : MonoBehaviour
         _isDead = true;
         _rb.linearVelocity = Vector2.zero;
         _rb.bodyType = RigidbodyType2D.Static;
-
-        StartCoroutine(ReloadAfterDelay());
-    }
-
-    private IEnumerator ReloadAfterDelay()
-    {
-        yield return new WaitForSeconds(DeathReloadDelay);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void OnGUI()
@@ -111,6 +102,49 @@ public class PlayerHealth : MonoBehaviour
             string heart = i < _currentHealth ? "♥" : "♡";
             style.normal.textColor = i < _currentHealth ? Color.red : Color.gray;
             GUI.Label(new Rect(x + i * w, y, w, h), heart, style);
+        }
+
+        if (_isDead)
+            DrawDeathPanel();
+    }
+
+    private void DrawDeathPanel()
+    {
+        float w = Screen.width;
+        float bw = 240f, bh = 44f, gap = 12f;
+
+        var titleStyle = new GUIStyle(GUI.skin.label)
+        {
+            fontSize  = 32,
+            fontStyle = FontStyle.Bold,
+            alignment = TextAnchor.MiddleCenter
+        };
+        titleStyle.normal.textColor = Color.white;
+
+        var buttonStyle = new GUIStyle(GUI.skin.button) { fontSize = 20 };
+
+        float totalHeight = 50f + gap + bh * 2f + gap;
+        float startY = (Screen.height - totalHeight) * 0.5f;
+
+        GUI.Box(new Rect(0, 0, w, Screen.height), GUIContent.none);
+        GUI.Label(new Rect(0, startY, w, 50f), "You Died", titleStyle);
+
+        var playAgainRect = new Rect((w - bw) * 0.5f, startY + 50f + gap, bw, bh);
+        if (GUI.Button(playAgainRect, "Play Again", buttonStyle))
+        {
+            if (LevelManager.Instance != null)
+                LevelManager.Instance.RestartLevel();
+            else
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+        var quitRect = new Rect((w - bw) * 0.5f, startY + 50f + gap + bh + gap, bw, bh);
+        if (GUI.Button(quitRect, "Quit", buttonStyle))
+        {
+            if (LevelManager.Instance != null)
+                LevelManager.Instance.LoadLevel(0);
+            else
+                SceneManager.LoadScene("MainMenu");
         }
     }
 }

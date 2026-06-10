@@ -195,6 +195,10 @@ MonoBehaviour:
   levels:
   - displayName: Level 1
     buildIndex: 1
+  - displayName: Level 2
+    buildIndex: 2
+  - displayName: Level 3
+    buildIndex: 3
 --- !u!4 &995725362
 Transform:
   m_ObjectHideFlags: 0

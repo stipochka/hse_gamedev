@@ -187,7 +187,10 @@ public class PlayerController : MonoBehaviour
         {
             bool shiftPressed = Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
             if (shiftPressed)
+            {
+                LevelManager.Instance?.CompleteLevel(SceneManager.GetActiveScene().buildIndex);
                 SceneManager.LoadScene(mainMenuSceneName);
+            }
         }
     }
 

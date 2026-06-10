@@ -17,25 +17,28 @@ public class NoiseHunterEnemy : MonoBehaviour
     public Transform boundaryLeft;
     public Transform boundaryRight;
 
+    [Header("Attack")]
+    public float attackRange = 1.2f;
+
     private Rigidbody2D _rb;
-    private SpriteRenderer _sprite;
+    private PlayerHealth _playerHealth;
     private State _currentState;
     private Vector2 _startPosition;
+    private Vector3 _originalScale;
 
     private const float ReachThreshold = 0.1f;
-
-    private static readonly Color ColorIdle   = Color.white;
-    private static readonly Color ColorChase  = Color.red;
-    private static readonly Color ColorReturn = Color.blue;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _originalScale = transform.localScale;
     }
 
     private void Start()
     {
-        _sprite = GetComponentInChildren<SpriteRenderer>();
+        if (player != null)
+            _playerHealth = player.GetComponentInParent<PlayerHealth>();
+
         _startPosition = _rb.position;
         EnterState(State.Idle);
     }
@@ -72,6 +75,10 @@ public class NoiseHunterEnemy : MonoBehaviour
         }
 
         MoveTowards(player.position.x, chaseSpeed);
+        FaceTowards(player.position.x);
+
+        if (Vector2.Distance(transform.position, player.position) < attackRange)
+            _playerHealth?.TakeDamage(1);
 
         // Игрок убежал за границу патруля — прекращаем погоню.
         if (!IsWithinBounds(player.position))
@@ -83,6 +90,7 @@ public class NoiseHunterEnemy : MonoBehaviour
     private void UpdateReturn()
     {
         MoveTowards(_startPosition.x, returnSpeed);
+        FaceTowards(_startPosition.x);
 
         if (Mathf.Abs(_rb.position.x - _startPosition.x) <= ReachThreshold)
             EnterState(State.Idle);
@@ -106,6 +114,16 @@ public class NoiseHunterEnemy : MonoBehaviour
         _rb.linearVelocity = new Vector2(vx, _rb.linearVelocity.y);
     }
 
+    private void FaceTowards(float targetX)
+    {
+        float dx = targetX - _rb.position.x;
+        if (Mathf.Abs(dx) <= ReachThreshold) return;
+
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(_originalScale.x) * (dx < 0f ? -1f : 1f);
+        transform.localScale = scale;
+    }
+
     private bool PlayerHeard()
     {
         if (playerNoise == null || player == null) return false;
@@ -125,14 +143,6 @@ public class NoiseHunterEnemy : MonoBehaviour
     private void EnterState(State next)
     {
         _currentState = next;
-        if (_sprite == null) return;
-
-        switch (next)
-        {
-            case State.Idle:   _sprite.color = ColorIdle;   break;
-            case State.Chase:  _sprite.color = ColorChase;  break;
-            case State.Return: _sprite.color = ColorReturn; break;
-        }
     }
 
     private void OnDrawGizmosSelected()

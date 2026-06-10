@@ -59,13 +59,19 @@ public class MainMenuUI : MonoBehaviour
         for (int i = 0; i < levels.Length; i++)
         {
             var rect = new Rect((w - bw) * 0.5f, startY + i * (bh + gap), bw, bh);
-            if (GUI.Button(rect, levels[i].displayName, buttonStyle))
+
+            bool unlocked = LevelManager.Instance == null || LevelManager.Instance.IsLevelUnlocked(levels[i].buildIndex);
+            string label = unlocked ? levels[i].displayName : $"{levels[i].displayName} 🔒";
+
+            GUI.enabled = unlocked;
+            if (GUI.Button(rect, label, buttonStyle) && unlocked)
             {
                 if (LevelManager.Instance != null)
                     LevelManager.Instance.LoadLevel(levels[i].buildIndex);
                 else
                     Debug.LogError("[MainMenuUI] LevelManager.Instance не найден — добавь GameObject с LevelManager в сцену.");
             }
+            GUI.enabled = true;
         }
 
         var backRect = new Rect((w - bw) * 0.5f, startY + levels.Length * (bh + gap) + gap, bw, bh);

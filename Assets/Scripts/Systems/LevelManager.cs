@@ -31,4 +31,24 @@ public class LevelManager : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+
+    private const string UnlockedLevelKey = "UnlockedLevel";
+
+    // Уровень доступен, если его buildIndex не превышает наибольший открытый.
+    public bool IsLevelUnlocked(int buildIndex)
+    {
+        int unlocked = PlayerPrefs.GetInt(UnlockedLevelKey, 1);
+        return buildIndex <= unlocked;
+    }
+
+    // Открывает следующий уровень после завершения текущего.
+    public void CompleteLevel(int buildIndex)
+    {
+        int unlocked = PlayerPrefs.GetInt(UnlockedLevelKey, 1);
+        if (buildIndex + 1 > unlocked)
+        {
+            PlayerPrefs.SetInt(UnlockedLevelKey, buildIndex + 1);
+            PlayerPrefs.Save();
+        }
+    }
 }
