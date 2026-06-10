@@ -126,10 +126,7 @@ public class EnemyFSM : MonoBehaviour
     private void UpdateSearch()
     {
         if (!ReachedPoint(_lastKnownPlayerPos))
-        {
             MoveTowards2D(_lastKnownPlayerPos, patrolSpeed);
-            return;
-        }
 
         _searchTimer -= Time.deltaTime;
 

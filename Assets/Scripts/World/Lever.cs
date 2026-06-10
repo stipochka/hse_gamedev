@@ -24,6 +24,11 @@ public class Lever : MonoBehaviour, IInteractable
     {
         isActivated = !isActivated;
         RefreshVisual();
+
+        Vector3 scale = transform.localScale;
+        scale.x = -scale.x;
+        transform.localScale = scale;
+
         linkedDoor?.Toggle();
     }
 
