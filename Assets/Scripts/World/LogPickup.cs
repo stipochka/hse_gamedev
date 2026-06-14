@@ -6,6 +6,8 @@ public class LogPickup : MonoBehaviour, IInteractable
 {
     [SerializeField] private LogEntry logEntry;
 
+    public LogEntry LogEntry => logEntry;
+
     private SpriteRenderer _sprite;
     private bool _collected;
 

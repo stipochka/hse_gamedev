@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] public float moveSpeed = 7f;
+    [SerializeField] public float crouchSpeedMultiplier = 0.5f;
     [SerializeField] public float jumpForce = 14f;
     [SerializeField] public float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask groundLayer;
@@ -31,6 +32,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 _colliderDefaultOffset;
 
     private bool _isGrounded;
+    private bool _isCrouching;
     private float _coyoteTimeCounter;
     private float _jumpBufferCounter;
 
@@ -141,7 +143,8 @@ public class PlayerController : MonoBehaviour
     private void HandleMovement()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
-        _rb.linearVelocity = new Vector2(horizontal * moveSpeed, _rb.linearVelocity.y);
+        float speed = _isCrouching ? moveSpeed * crouchSpeedMultiplier : moveSpeed;
+        _rb.linearVelocity = new Vector2(horizontal * speed, _rb.linearVelocity.y);
     }
 
     private void ApplyQueuedJump()
@@ -226,6 +229,7 @@ public class PlayerController : MonoBehaviour
     private void HandleCrouch()
     {
         bool crouching = Input.GetAxisRaw("Vertical") < -0.5f;
+        _isCrouching = crouching;
 
         if (crouching)
         {

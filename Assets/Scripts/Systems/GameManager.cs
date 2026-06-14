@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -23,9 +24,41 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
 
-        foreach (var entry in allLogs)
-            if (entry != null) entry.isFound = false;
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        RefreshLogsForScene();
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        RefreshLogsForScene();
+    }
+
+    // Каждый уровень содержит свой набор записок — пересобираем список и сбрасываем
+    // прогресс, иначе счётчик "Notes: x/y" остаётся от предыдущего уровня.
+    private void RefreshLogsForScene()
+    {
+        allLogs.Clear();
+        _collectedLogs.Clear();
+        _displayedLog = null;
+        _popupTimer   = 0f;
+
+        foreach (var pickup in FindObjectsByType<LogPickup>(FindObjectsSortMode.None))
+        {
+            var entry = pickup.LogEntry;
+            if (entry == null || allLogs.Contains(entry)) continue;
+
+            entry.isFound = false;
+            allLogs.Add(entry);
+        }
     }
 
     private void Update()

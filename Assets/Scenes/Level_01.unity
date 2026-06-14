@@ -1119,7 +1119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3db986d11919447648e1915384bbc4ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickup
-  logEntry: {fileID: 11400000, guid: 3ab3e11ceb8454bdc82e55df1dd1f527, type: 2}
+  logEntry: {fileID: 11400000, guid: 6bddac7936f8f4413aeece72c9402008, type: 2}
 --- !u!212 &897744798
 SpriteRenderer:
   serializedVersion: 2
@@ -1747,7 +1747,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3db986d11919447648e1915384bbc4ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogPickup
-  logEntry: {fileID: 11400000, guid: b0ed6c7e6ffa74e2b8556ba7f96209a9, type: 2}
+  logEntry: {fileID: 11400000, guid: b75bac2144dbf4352ab4c12d1a097c66, type: 2}
 --- !u!212 &1321417989
 SpriteRenderer:
   serializedVersion: 2
@@ -1862,7 +1862,7 @@ Transform:
   m_GameObject: {fileID: 1321417987}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.59, y: 0.19, z: 0}
+  m_LocalPosition: {x: -6.92, y: 0.39, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
