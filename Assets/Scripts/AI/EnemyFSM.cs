@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(AudioSource))]
 public class EnemyFSM : MonoBehaviour
 {
     public enum State { Patrol, Alert, Chase, Search }
@@ -24,9 +25,14 @@ public class EnemyFSM : MonoBehaviour
     [Header("Attack")]
     public float attackRange = 0.6f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip chaseSound;
+    [SerializeField] [Range(0f, 1f)] private float chaseVolume = 0.7f;
+
     private Rigidbody2D _rb;
     private SpriteRenderer _sprite;
     private PlayerHealth _playerHealth;
+    private AudioSource _audioSource;
     private Vector3 _originalScale;
 
     private State _currentState;
@@ -47,7 +53,13 @@ public class EnemyFSM : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _sprite = GetComponent<SpriteRenderer>();
+        _audioSource = GetComponent<AudioSource>();
         _originalScale = transform.localScale;
+
+        _audioSource.clip = chaseSound;
+        _audioSource.loop = true;
+        _audioSource.volume = chaseVolume;
+        _audioSource.playOnAwake = false;
 
         // Враг не падает и не прыгает — Rigidbody2D используется только для горизонтального движения.
         _rb.constraints |= RigidbodyConstraints2D.FreezePositionY;
@@ -156,6 +168,8 @@ public class EnemyFSM : MonoBehaviour
                 break;
 
             case State.Chase:
+                if (chaseSound != null && !_audioSource.isPlaying)
+                    _audioSource.Play();
                 break;
 
             case State.Search:
@@ -165,6 +179,9 @@ public class EnemyFSM : MonoBehaviour
                 _lastKnownPlayerPos = ClampToPatrolBounds(_lastKnownPlayerPos);
                 break;
         }
+
+        if (next != State.Chase && _audioSource.isPlaying)
+            _audioSource.Stop();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

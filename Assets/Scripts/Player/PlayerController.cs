@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CapsuleCollider2D))]
+[RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] public float moveSpeed = 7f;
@@ -24,9 +25,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxX = 10f;
     [SerializeField] private float deathY = -10f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip footstepClip;
+    [SerializeField] private AudioClip jumpClip;
+    [SerializeField] private float footstepInterval = 0.35f;
+    [SerializeField] private float crouchFootstepInterval = 0.55f;
+
     private Rigidbody2D _rb;
     private CapsuleCollider2D _collider;
     private PlayerHealth _health;
+    private AudioSource _audioSource;
+
+    private float _footstepTimer;
 
     private Vector2 _colliderDefaultSize;
     private Vector2 _colliderDefaultOffset;
@@ -49,6 +59,7 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _collider = GetComponent<CapsuleCollider2D>();
         _health = GetComponent<PlayerHealth>();
+        _audioSource = GetComponent<AudioSource>();
 
         _colliderDefaultSize = _collider.size;
         _colliderDefaultOffset = _collider.offset;
@@ -62,6 +73,7 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         HandleCrouch();
         HandleInteraction();
+        HandleFootsteps();
     }
 
     private void FixedUpdate()
@@ -131,6 +143,9 @@ public class PlayerController : MonoBehaviour
             _jumpQueued = true;
             _jumpBufferCounter = 0f;
             _coyoteTimeCounter = 0f;
+
+            if (jumpClip != null)
+                _audioSource.PlayOneShot(jumpClip);
         }
 
         bool jumpReleased = Input.GetButtonUp("Jump")
@@ -240,6 +255,27 @@ public class PlayerController : MonoBehaviour
         else if (!IsCeilingAbove())
         {
             _collider.size = _colliderDefaultSize;
+        }
+    }
+
+    // Проигрывает шаги, пока игрок стоит на земле и движется горизонтально.
+    private void HandleFootsteps()
+    {
+        bool moving = _isGrounded && Mathf.Abs(_rb.linearVelocity.x) > 0.1f;
+
+        if (!moving)
+        {
+            _footstepTimer = 0f;
+            return;
+        }
+
+        _footstepTimer -= Time.deltaTime;
+        if (_footstepTimer <= 0f)
+        {
+            if (footstepClip != null)
+                _audioSource.PlayOneShot(footstepClip);
+
+            _footstepTimer = _isCrouching ? crouchFootstepInterval : footstepInterval;
         }
     }
 
